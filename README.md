@@ -29,6 +29,7 @@
 exam-solver/
 ├── index.html      # 站点入口：目录、搜索、阅读视图
 ├── data.js         # 由 solutions/*.md 生成的题目数据（含全文）
+├── exam.pdf        # 原始试卷
 ├── vendor/         # KaTeX 与 marked，公式渲染所需，已本地化
 ├── solutions/      # 180 篇题解 Markdown，按「院校-科目-序号」命名
 │   └── index.md    # 双链索引，可直接放 Obsidian
@@ -54,5 +55,6 @@ python _scripts/build_data.py
 
 ## 未包含的内容
 
-- 原始试卷 PDF 没有放进仓库。
-- `_scripts/` 下的抽取与调用脚本没有放进仓库。
+`_scripts/` 下的抽取与调用脚本没有放进仓库（其中含 API 凭证）。
+
+原始试卷见 `exam.pdf`。
