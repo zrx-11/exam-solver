@@ -3,7 +3,7 @@
 <title>考研数学题解库 · 180 题</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="2026 年数学专业名校考研真题题解，十所院校、高等代数与数学分析共 180 题，含思路推演与易错点。">
+<meta name="description" content="考研数学真题题解：十所院校的高等代数与数学分析，以及 1987–2025 全国统考数学真题，逐题给出思路推演与易错点。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2324486B'/><text x='16' y='23' font-size='20' font-family='serif' text-anchor='middle' fill='%23F7F5F0'>题</text></svg>">
 <link rel="stylesheet" href="vendor/katex/katex.min.css">
 <style>
@@ -336,7 +336,7 @@
   </button>
   <div class="brand">
     <a href="#/" class="mark">考研数学题解库</a>
-    <span class="sub">2026 · 十校 · 180 题</span>
+    <span class="sub" id="topSub">十校 · 统考</span>
   </div>
   <div class="searchwrap">
     <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
@@ -361,6 +361,7 @@
   if(!DATA){document.getElementById('main').innerHTML='<div class="home"><p>数据未加载。请确认 data.js 与页面同目录。</p></div>';return;}
 
   var docs = DATA.docs, schools = DATA.schools;
+  var subEl=document.getElementById('topSub'); if(subEl) subEl.textContent='十校 · 统考 · '+docs.length+' 题';
   var $ = function(s){return document.querySelector(s)};
   var rail = $('#rail'), main = $('#main'), q = $('#q'), qClear = $('#qClear'), scrim = $('#scrim');
 
@@ -426,8 +427,8 @@
   /* ---------- 首页 ---------- */
   function homeView(){
     var html = '<div class="home">'
-      + '<h1 class="home-title">2026 年数学专业考研真题题解</h1>'
-      + '<p class="home-note">十所院校的高等代数与数学分析试卷，<b>共 '+docs.length+' 题</b>。每题按「题干 — 题型识别 — 思路推演 — 正式解答 — 验证 — 易错点 — 同类题信号」拆开，思路部分保留了取舍和试错的过程，不是只给最终答案。</p>'
+      + '<h1 class="home-title">考研数学真题题解</h1>'
+      + '<p class="home-note">十所院校的高等代数与数学分析试卷，以及全国统考数学真题，<b>共 '+docs.length+' 题</b>。每题按「题干 — 题型识别 — 思路推演 — 正式解答 — 验证 — 错点 — 同类题信号」拆开，思路部分保留了取舍和试错的过程，不是只给最终答案。</p>'
       + '<div class="ledger">';
     schools.forEach(function(s){
       var kinds = s.subjects.map(function(x){return x.label+' '+x.items.length}).join('　/　');
