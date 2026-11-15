@@ -74,7 +74,11 @@ def main():
     data["docs"] = [d for d in data["docs"] if d.get("school") != "全国统考"]
     data["schools"] = [s for s in data["schools"] if s["name"] != "全国统考"]
 
-    files = sorted([p for p in os.listdir(SRC) if re.match(r"\d{4}-数学.+\.md$", p)], reverse=True)
+    ORDER = {"数学一": 1, "数学二": 2, "数学三": 3, "数学农": 4, "数学（农）": 4}
+    def sort_key(fn):
+        m = re.match(r"(\d{4})-(数学.+?)\.md$", fn)
+        return (-int(m.group(1)), ORDER.get(m.group(2), 9))
+    files = sorted([p for p in os.listdir(SRC) if re.match(r"\d{4}-数学.+\.md$", p)], key=sort_key)
     subjects = []
     base = len(data["docs"])
     for fn in files:
