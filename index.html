@@ -466,8 +466,23 @@
   }
 
   /* ---------- 文档页 ---------- */
+  var MATH_STASH = [];
+  function stashMath(md){
+    MATH_STASH = [];
+    // 先把公式整段摘出来，避免 marked 把 LaTeX 里的 \\ 当成 Markdown 转义
+    return md.replace(/\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$[^\$\n]+\$/g, function(m){
+      MATH_STASH.push(m);
+      return '@@M' + (MATH_STASH.length - 1) + '@@';
+    });
+  }
+  function restoreMath(html){
+    return html.replace(/@@M(\d+)@@/g, function(_, k){
+      var m = MATH_STASH[+k] || '';
+      return m.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    });
+  }
   function renderMD(md){
-    return marked.parse(md, {mangle:false, headerIds:false});
+    return restoreMath(marked.parse(stashMath(md), {mangle:false, headerIds:false}));
   }
 
   var SECTION_JUMP = [
