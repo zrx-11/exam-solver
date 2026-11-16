@@ -74,7 +74,9 @@ def main():
     data["docs"] = [d for d in data["docs"] if d.get("school") != "全国统考"]
     data["schools"] = [s for s in data["schools"] if s["name"] != "全国统考"]
 
-    ORDER = {"数学一": 1, "数学二": 2, "数学三": 3, "数学农": 4, "数学（农）": 4}
+    ORDER = {"数学一": 1, "数学二": 2, "数学三": 3, "数学四": 4,
+             "数学试卷I": 1, "数学试卷II": 2, "数学试卷III": 3, "数学试卷IV": 4, "数学试卷V": 5,
+             "数学农": 6, "数学（农）": 6}
     def sort_key(fn):
         m = re.match(r"(\d{4})-(数学.+?)\.md$", fn)
         return (-int(m.group(1)), ORDER.get(m.group(2), 9))
@@ -87,7 +89,7 @@ def main():
             continue
         year, paper, probs = res
         label = "%s %s" % (year, paper.replace("数学", "数学"))
-        label = "%s %s" % (year, {"数学一": "数学一", "数学二": "数学二", "数学三": "数学三", "数学农": "数学（农）"}.get(paper, paper))
+        label = "%s %s" % (year, {"数学农": "数学（农）"}.get(paper, paper.replace("数学试卷", "试卷")))
         items = []
         for p in probs:
             idx = len(data["docs"])
