@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<title>考研数学题解库 · 180 题</title>
+<title>考研数学题解库</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="考研数学真题题解：十所院校的高等代数与数学分析，以及 1987–2025 全国统考数学真题，逐题给出思路推演与易错点。">
@@ -184,6 +184,10 @@
     font-variant-numeric:tabular-nums;
   }
   .ledger-row:hover .school{color:var(--accent)}
+  .yr-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+    margin-top:26px;padding:0 0 7px;border-bottom:1px solid var(--line)}
+  .yr-head .yr{font-family:var(--serif);font-size:19px;letter-spacing:.08em;color:var(--ink)}
+  .yr-head .cnt{font-family:var(--serif);font-size:12px;color:var(--ink-3);letter-spacing:.06em}
   .foot{
     margin-top:26px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;
     font-size:13px;color:var(--ink-3);
@@ -361,6 +365,7 @@
   if(!DATA){document.getElementById('main').innerHTML='<div class="home"><p>数据未加载。请确认 data.js 与页面同目录。</p></div>';return;}
 
   var docs = DATA.docs, schools = DATA.schools;
+  document.title = '考研数学题解库 · ' + docs.length + ' 题';
   var subEl=document.getElementById('topSub'); if(subEl) subEl.textContent='十校 · 统考 · '+docs.length+' 题';
   var $ = function(s){return document.querySelector(s)};
   var rail = $('#rail'), main = $('#main'), q = $('#q'), qClear = $('#qClear'), scrim = $('#scrim');
@@ -431,7 +436,13 @@
       + '<p class="home-note">十所院校的高等代数与数学分析试卷，以及全国统考数学真题，<b>共 '+docs.length+' 题</b>。每题按「题干 — 题型识别 — 思路推演 — 正式解答 — 验证 — 错点 — 同类题信号」拆开，思路部分保留了取舍和试错的过程，不是只给最终答案。</p>'
       + '<div class="ledger">';
     schools.forEach(function(s){
-      var kinds = s.subjects.map(function(x){return x.label+' '+x.items.length}).join('　/　');
+      var kinds;
+      if(s.subjects.length > 8){
+        var ys = s.subjects.map(function(x){return (/^(\d{4})/.exec(x.label)||[])[1]}).filter(Boolean);
+        kinds = s.subjects.length + ' 套 · ' + ys[ys.length-1] + '–' + ys[0];
+      } else {
+        kinds = s.subjects.map(function(x){return x.label+' '+x.items.length}).join('　/　');
+      }
       html += '<a class="ledger-row" href="#/s/'+encodeURIComponent(s.name)+'">'
         + '<span class="left"><span class="school">'+esc(s.name)+'</span><span class="kinds">'+esc(kinds)+'</span></span>'
         + '<span class="dots"></span>'
@@ -449,19 +460,43 @@
   function schoolView(name){
     var s = schools.filter(function(x){return x.name===name})[0];
     if(!s) return homeView();
+    var big = s.subjects.length > 8;
+    var totalQ = s.subjects.reduce(function(a,x){return a+x.items.length},0);
+    var ys = s.subjects.map(function(x){return (/^(\d{4})/.exec(x.label)||[])[1]}).filter(Boolean);
+    var note = big
+      ? s.subjects.length+' 套 · '+ys[ys.length-1]+'–'+ys[0]+' · 共 '+totalQ+' 题。点一套从第一题进入，页脚翻页可顺读全卷。'
+      : s.subjects.map(function(x){return x.label+' '+x.items.length+' 题'}).join('，')+'。';
     var html = '<div class="home"><div class="crumb"><a href="#/">目录</a><span class="sep">/</span>'+esc(s.name)+'</div>'
       + '<h1 class="home-title" style="margin-top:14px">'+esc(s.name)+'</h1>'
-      + '<p class="home-note">'+esc(s.subjects.map(function(x){return x.label+' '+x.items.length+' 题'}).join('，'))+'。</p>'
+      + '<p class="home-note">'+esc(note)+'</p>'
       + '<div class="ledger">';
-    s.subjects.forEach(function(sub){
-      sub.items.forEach(function(i){
-        var d = docs[i];
-        html += '<a class="ledger-row" href="#/d/'+i+'">'
-          + '<span class="left"><span class="school" style="font-size:15px">'+esc(d.titlePlain||('第'+d.noLabel+'题'))+'</span>'
-          + '<span class="kinds">'+esc(sub.label)+'　第 '+d.noLabel+' 题'+(readSet[i]?'　已读':'')+'</span></span>'
-          + '<span class="dots"></span><span class="num">'+d.noLabel+'</span></a>';
+    if(big){
+      var lastY = '';
+      s.subjects.forEach(function(sub){
+        var y = (/^(\d{4})/.exec(sub.label)||[])[1] || '';
+        if(y !== lastY){
+          var n = s.subjects.filter(function(x){return x.label.indexOf(y)===0})
+                             .reduce(function(a,x){return a+x.items.length},0);
+          html += '<div class="yr-head"><span class="yr">'+esc(y)+'</span><span class="cnt">'+n+' 题</span></div>';
+          lastY = y;
+        }
+        var first = sub.items[0];
+        html += '<a class="ledger-row" href="#/d/'+first+'">'
+          + '<span class="left"><span class="school" style="font-size:15px">'+esc(sub.label.replace(/^\d{4}\s*/,''))+'</span>'
+          + '<span class="kinds">'+sub.items.length+' 题　第 '+docs[first].noLabel+' 题起'+(readSet[first]?'　已读':'')+'</span></span>'
+          + '<span class="dots"></span><span class="num">'+sub.items.length+'</span></a>';
       });
-    });
+    } else {
+      s.subjects.forEach(function(sub){
+        sub.items.forEach(function(i){
+          var d = docs[i];
+          html += '<a class="ledger-row" href="#/d/'+i+'">'
+            + '<span class="left"><span class="school" style="font-size:15px">'+esc(d.titlePlain||('第'+d.noLabel+'题'))+'</span>'
+            + '<span class="kinds">'+esc(sub.label)+'　第 '+d.noLabel+' 题'+(readSet[i]?'　已读':'')+'</span></span>'
+            + '<span class="dots"></span><span class="num">'+d.noLabel+'</span></a>';
+        });
+      });
+    }
     return html+'</div></div>';
   }
 
@@ -613,6 +648,9 @@
   var timer = null;
   q.addEventListener('input', function(){
     qClear.style.display = q.value ? 'block' : 'none';
+    if(window.innerWidth < 900 && q.value.trim()){
+      rail.classList.remove('hidden'); scrim.classList.add('on');
+    }
     clearTimeout(timer);
     timer = setTimeout(function(){
       rail.innerHTML = q.value.trim() ? railSearch(q.value.trim()) : railTree(current.idx);
